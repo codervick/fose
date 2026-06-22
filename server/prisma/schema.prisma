@@ -1,0 +1,142 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                   String   @id @default(uuid())
+  name                 String
+  email                String   @unique
+  password             String
+  gmailToken           String?
+  gmailRefreshToken    String?
+  createdAt            DateTime @default(now())
+
+  eventsAsDriver       Event[]
+  branchesCreated      Branch[]
+  nodesCreated         Node[]
+  partiesAdded         Party[]
+  accessGranted        BranchAccess[]
+}
+
+model Event {
+  id          String    @id @default(uuid())
+  title       String
+  driver      User      @relation(fields: [driverId], references: [id])
+  driverId    String
+  status      EventStatus @default(ACTIVE)
+  createdAt   DateTime  @default(now())
+  closedAt    DateTime?
+
+  parties     Party[]
+  branches    Branch[]
+}
+
+model Party {
+  id        String      @id @default(uuid())
+  event     Event       @relation(fields: [eventId], references: [id])
+  eventId   String
+  name      String
+  email     String
+  type      PartyType
+  role      PartyRole
+  addedBy   User        @relation(fields: [addedById], references: [id])
+  addedById String
+
+  branchAccess  BranchAccess[]
+  assignedNodes Node[]
+  alerts        Alert[]
+}
+
+model Branch {
+  id             String       @id @default(uuid())
+  event          Event        @relation(fields: [eventId], references: [id])
+  eventId        String
+  parentBranch   Branch?      @relation("BranchHierarchy", fields: [parentBranchId], references: [id])
+  parentBranchId String?
+  subBranches    Branch[]     @relation("BranchHierarchy")
+  title          String
+  status         BranchStatus @default(ACTIVE)
+  createdBy      User         @relation(fields: [createdById], references: [id])
+  createdById    String
+  createdAt      DateTime     @default(now())
+
+  nodes          Node[]
+  access         BranchAccess[]
+}
+
+model BranchAccess {
+  id          String  @id @default(uuid())
+  branch      Branch  @relation(fields: [branchId], references: [id])
+  branchId    String
+  party       Party   @relation(fields: [partyId], references: [id])
+  partyId     String
+  grantedBy   User    @relation(fields: [grantedById], references: [id])
+  grantedById String
+}
+
+model Node {
+  id             String     @id @default(uuid())
+  branch         Branch     @relation(fields: [branchId], references: [id])
+  branchId       String
+  type           NodeType
+  title          String
+  assignedTo     Party?     @relation(fields: [assignedToId], references: [id])
+  assignedToId   String?
+  status         NodeStatus @default(PENDING)
+  pendingSince   DateTime?
+  gmailMessageId String?
+  gmailThreadId  String?
+  notes          String?
+  createdBy      User       @relation(fields: [createdById], references: [id])
+  createdById    String
+  createdAt      DateTime   @default(now())
+
+  alerts         Alert[]
+}
+
+model Alert {
+  id          String   @id @default(uuid())
+  node        Node     @relation(fields: [nodeId], references: [id])
+  nodeId      String
+  pendingAt   Party    @relation(fields: [pendingAtId], references: [id])
+  pendingAtId String
+  daysPending Int
+  seen        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+enum EventStatus {
+  ACTIVE
+  CLOSED
+}
+
+enum PartyType {
+  INTERNAL
+  EXTERNAL
+}
+
+enum PartyRole {
+  DRIVER
+  DECISION_MAKER
+  PARTICIPANT
+}
+
+enum BranchStatus {
+  ACTIVE
+  CLOSED
+}
+
+enum NodeType {
+  EMAIL
+  TASK
+}
+
+enum NodeStatus {
+  PENDING
+  IN_PROGRESS
+  DONE
+}
