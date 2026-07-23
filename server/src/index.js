@@ -7,6 +7,7 @@ dotenv.config();
 const authRoutes = require('./routes/authRoutes');
 const gmailRoutes = require('./routes/gmailRoutes');
 const eventRoutes = require('./routes/eventRoutes');
+const branchRoutes = require('./routes/branchRoutes');
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/auth/gmail', gmailRoutes);
 app.use('/api/events', eventRoutes);
+app.use('/api/events/:eventId/branches', branchRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: 'FOSE API is running' });
