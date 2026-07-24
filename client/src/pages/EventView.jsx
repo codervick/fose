@@ -248,8 +248,7 @@ export default function EventView() {
 
       {/* Add Party Modal */}
       {showAddParty && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-gray-900 rounded-2xl p-6 w-full max-w-md">
+            <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50" onClick={(e) => e.stopPropagation()}>          <div className="bg-gray-900 rounded-2xl p-6 w-full max-w-md">
             <h2 className="text-white font-semibold mb-4">Add Party</h2>
             <div className="space-y-3">
               <input
