@@ -8,6 +8,8 @@ const authRoutes = require('./routes/authRoutes');
 const gmailRoutes = require('./routes/gmailRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 const branchRoutes = require('./routes/branchRoutes');
+const webhookRoutes = require('./routes/webhookRoutes');
+const emailRoutes = require('./routes/emailRoutes');
 
 const app = express();
 
@@ -18,6 +20,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/auth/gmail', gmailRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/events/:eventId/branches', branchRoutes);
+app.use('/api/events/:eventId/branches/:branchId/nodes', emailRoutes);
+app.use('/api/gmail', webhookRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: 'FOSE API is running' });
